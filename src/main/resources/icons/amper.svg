@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+    <defs>
+        <linearGradient id="amperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#7F52FF" />
+            <stop offset="100%" stop-color="#C711E1" />
+        </linearGradient>
+    </defs>
+    <rect x="2" y="2" width="12" height="12" rx="3" fill="url(#amperGrad)" />
+    <!-- Stylized 'A' letterform -->
+    <path
+        d="M 8 4.2 L 11.5 11.8 L 9.8 11.8 L 9.1 10.2 L 6.9 10.2 L 6.2 11.8 L 4.5 11.8 Z M 7.4 9 L 8.6 9 L 8 7.3 Z"
+        fill="#FFFFFF" />
+</svg>

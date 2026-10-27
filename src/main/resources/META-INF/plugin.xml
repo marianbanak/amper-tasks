@@ -1,0 +1,43 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+<idea-plugin>
+    <id>tk.mallumo.amper.tasks</id>
+    <name>Amper Tasks</name>
+    <vendor email="mallumo@users.noreply.github.com" url="https://github.com/mallumo">mallumo
+    </vendor>
+
+    <description><![CDATA[
+    <h3>Native Gradle-style Task Tool Window for Kotlin Amper</h3>
+    <p>
+      <b>Amper Tasks</b> brings the familiar, convenient sidebar experience to
+      <a href="https://github.com/JetBrains/amper">Kotlin Amper</a> projects in IntelliJ IDEA.
+    </p>
+
+    <h4>Key Features:</h4>
+    <ul>
+      <li><b>Zero Configuration</b>: Automatically detects <code>project.yaml</code>, <code>module.yaml</code>, or <code>./kotlin</code> wrapper upon opening.</li>
+      <li><b>Double-Click to Run</b>: Double-click any task or select and press Enter to execute.</li>
+      <li><b>Integrated Console</b>: Tasks stream directly into IntelliJ's standard Run tool window with ANSI colors and stop (■) control.</li>
+      <li><b>Smart Multi-Module Support</b>: Run project-wide tasks or target specific submodules (<code>-m &lt;module&gt;</code>) without typing.</li>
+      <li><b>Application Run Support</b>: Auto-detects <code>product: app/...</code> modules to provide one-click run tasks.</li>
+      <li><b>Publishing Discovery</b>: Automatically generates publish tasks for repositories marked with <code>publish: true</code> (<code>mavenLocal</code>, Repsy, etc.).</li>
+      <li><b>Project &amp; Module Inspection</b>: Quick access to <code>show modules</code>, <code>show tasks</code>, <code>show dependencies</code>, and <code>show settings</code>.</li>
+    </ul>
+    ]]></description>
+
+    <change-notes><![CDATA[
+    <h3>1.0.0</h3>
+    <ul>
+      <li>Initial release of Amper Tasks for IntelliJ IDEA.</li>
+      <li>Full project and module task tree visualization.</li>
+      <li>Double-click task execution in integrated Run console.</li>
+      <li>Auto-detection of application modules and publishable repositories.</li>
+    </ul>
+    ]]></change-notes>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="Amper" anchor="right" secondary="false" icon="/icons/amper.svg"
+            factoryClass="tk.mallumo.amper.tasks.ui.AmperToolWindowFactory" />
+    </extensions>
+</idea-plugin>

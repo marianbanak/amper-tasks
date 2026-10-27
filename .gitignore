@@ -1,0 +1,9 @@
+.gradle/
+.intellijPlatform/
+build/
+.idea/
+local.properties
+*.iml
+*.iws
+out/
+.DS_Store
