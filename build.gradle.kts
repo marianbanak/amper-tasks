@@ -1,4 +1,5 @@
 import java.util.Properties
+import java.util.zip.ZipOutputStream
 
 plugins {
     id("java")
@@ -41,6 +42,29 @@ intellijPlatform {
             untilBuild = provider { null }
         }
     }
+}
+
+val dummySearchableOptions = tasks.register("dummySearchableOptions") {
+    val file =
+        layout.buildDirectory.file("libs/${project.name}-${project.version}-searchableOptions.jar")
+    outputs.file(file)
+    doLast {
+        val target = file.get().asFile
+        if (!target.exists()) {
+            target.parentFile.mkdirs()
+            ZipOutputStream(target.outputStream()).close()
+        }
+    }
+}
+
+tasks.named("buildPlugin") {
+    dependsOn(dummySearchableOptions)
+}
+
+tasks.matching {
+    it.name.startsWith("publish") || it.name.startsWith("generateMetadata") || it.name.startsWith("generatePom")
+}.configureEach {
+    dependsOn(dummySearchableOptions)
 }
 
 kotlin {

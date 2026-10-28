@@ -127,39 +127,7 @@ class AmperTreePanel(private val project: Project) : JPanel(BorderLayout()) {
     }
 
     private fun updateTreeModel(amperProject: AmperProject) {
-        val rootNode = AmperTreeNode.ProjectNode(amperProject)
-
-        // 1. Project level Tasks
-        if (amperProject.projectTasks.isNotEmpty()) {
-            val tasksRoot = AmperTreeNode.TasksRootNode()
-            val groups = amperProject.projectTasks.groupBy { it.group }
-            for ((group, tasks) in groups) {
-                val groupNode = AmperTreeNode.GroupNode(group)
-                for (task in tasks) {
-                    groupNode.add(AmperTreeNode.TaskNode(task))
-                }
-                tasksRoot.add(groupNode)
-            }
-            rootNode.add(tasksRoot)
-        }
-
-        // 2. Modules
-        for (module in amperProject.modules) {
-            val moduleNode = AmperTreeNode.ModuleNode(module)
-            val modTasks = amperProject.moduleTasks[module] ?: emptyList()
-            if (modTasks.isNotEmpty()) {
-                val groups = modTasks.groupBy { it.group }
-                for ((group, tasks) in groups) {
-                    val groupNode = AmperTreeNode.GroupNode(group)
-                    for (task in tasks) {
-                        groupNode.add(AmperTreeNode.TaskNode(task))
-                    }
-                    moduleNode.add(groupNode)
-                }
-            }
-            rootNode.add(moduleNode)
-        }
-
+        val rootNode = AmperTreeNode.buildTree(amperProject)
         tree.model = DefaultTreeModel(rootNode)
 
         // Expand root and project tasks

@@ -23,6 +23,11 @@ class AmperTreeCellRenderer : ColoredTreeCellRenderer() {
                 append(value.title, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES)
             }
 
+            is AmperTreeNode.DirectoryNode -> {
+                icon = AllIcons.Nodes.Folder
+                append(value.title, SimpleTextAttributes.REGULAR_ATTRIBUTES)
+            }
+
             is AmperTreeNode.ModuleNode -> {
                 icon = AllIcons.Nodes.Module
                 append(value.title, SimpleTextAttributes.REGULAR_ATTRIBUTES)
