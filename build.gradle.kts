@@ -44,6 +44,7 @@ intellijPlatform {
     }
 }
 
+
 val dummySearchableOptions = tasks.register("dummySearchableOptions") {
     val file =
         layout.buildDirectory.file("libs/${project.name}-${project.version}-searchableOptions.jar")
