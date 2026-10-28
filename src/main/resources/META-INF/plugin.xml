@@ -39,5 +39,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="Amper" anchor="right" secondary="false" icon="/icons/amper.svg"
             factoryClass="tk.mallumo.amper.tasks.ui.AmperToolWindowFactory" />
+        <configurationType
+            implementation="tk.mallumo.amper.tasks.execution.AmperRunConfigurationType" />
     </extensions>
 </idea-plugin>

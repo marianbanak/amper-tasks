@@ -326,7 +326,7 @@ object AmperProjectScanner {
             )
         )
 
-        // Run (if application)
+        // Run & Package (if application)
         if (module.isApplication) {
             tasks.add(
                 AmperTask(
@@ -334,6 +334,15 @@ object AmperProjectScanner {
                     TaskGroup.RUN,
                     listOf("run") + modArg,
                     "Run application in module ${module.name}",
+                    module
+                )
+            )
+            tasks.add(
+                AmperTask(
+                    "package",
+                    TaskGroup.BUILD,
+                    listOf("package") + modArg,
+                    "Package application in module ${module.name} into an executable JAR",
                     module
                 )
             )
