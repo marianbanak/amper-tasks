@@ -31,9 +31,71 @@ object AmperProjectScanner {
         val modules = scanModules(rootDir)
         val allPublishRepos = modules.flatMap { it.publishableRepositories }.distinct()
 
-        val projectTasks = buildProjectTasks(allPublishRepos)
+        val customTasksService = project.getService(AmperCustomTasksService::class.java)
+        val customGroupsMap = customTasksService?.getAllCustomGroups() ?: emptyMap()
+
+        val projectTasks = buildProjectTasks(allPublishRepos).toMutableList()
+        val projectCustomCmds = customTasksService?.getCommands("") ?: emptyList()
+        for (cmd in projectCustomCmds) {
+            projectTasks.add(
+                AmperTask(
+                    name = cmd.name,
+                    groupName = cmd.groupName,
+                    commandArgs = emptyList(),
+                    description = cmd.command,
+                    module = null,
+                    isCustom = true,
+                    customCommandId = cmd.id,
+                    rawCommandLine = cmd.command,
+                    workingDir = cmd.workingDir.ifEmpty { rootDir.path }
+                )
+            )
+        }
+
         val moduleTasks = modules.associateWith { module ->
-            buildModuleTasks(module)
+            val tasks = buildModuleTasks(module).toMutableList()
+            val modCustomCmds = customTasksService?.getCommands(module.path) ?: emptyList()
+            for (cmd in modCustomCmds) {
+                tasks.add(
+                    AmperTask(
+                        name = cmd.name,
+                        groupName = cmd.groupName,
+                        commandArgs = emptyList(),
+                        description = cmd.command,
+                        module = module,
+                        isCustom = true,
+                        customCommandId = cmd.id,
+                        rawCommandLine = cmd.command,
+                        workingDir = cmd.workingDir.ifEmpty { module.moduleDir.path }
+                    )
+                )
+            }
+            tasks
+        }
+
+        val directoryTasks = mutableMapOf<String, MutableList<AmperTask>>()
+        val allCommands = customTasksService?.getAllCommands() ?: emptyList()
+        val modulePaths = modules.map { it.path }.toSet()
+        for (cmd in allCommands) {
+            if (cmd.modulePath.isNotEmpty() && !modulePaths.contains(cmd.modulePath)) {
+                val dirFile = rootDir.findFileByRelativePath(cmd.modulePath)
+                val defaultDir =
+                    dirFile?.path ?: java.io.File(rootDir.path, cmd.modulePath).absolutePath
+                directoryTasks.getOrPut(cmd.modulePath) { mutableListOf() }.add(
+                    AmperTask(
+                        name = cmd.name,
+                        groupName = cmd.groupName,
+                        commandArgs = emptyList(),
+                        description = cmd.command,
+                        module = null,
+                        isCustom = true,
+                        customCommandId = cmd.id,
+                        rawCommandLine = cmd.command,
+                        workingDir = cmd.workingDir.ifEmpty { defaultDir },
+                        targetPath = cmd.modulePath
+                    )
+                )
+            }
         }
 
         return AmperProject(
@@ -41,7 +103,9 @@ object AmperProjectScanner {
             rootDir = rootDir,
             projectTasks = projectTasks,
             modules = modules,
-            moduleTasks = moduleTasks
+            moduleTasks = moduleTasks,
+            customGroups = customGroupsMap,
+            directoryTasks = directoryTasks
         )
     }
 
@@ -70,7 +134,7 @@ object AmperProjectScanner {
                                 }
                                 modules.add(
                                     AmperModule(
-                                        name = modPathStr,
+                                        name = modDir.name,
                                         path = modPathStr,
                                         moduleDir = modDir,
                                         platforms = platforms,
@@ -122,7 +186,7 @@ object AmperProjectScanner {
                                 )
                                 modules.add(
                                     AmperModule(
-                                        name = relPath,
+                                        name = file.name,
                                         path = relPath,
                                         moduleDir = file,
                                         platforms = platforms,
@@ -284,7 +348,7 @@ object AmperProjectScanner {
 
     private fun buildModuleTasks(module: AmperModule): List<AmperTask> {
         val tasks = mutableListOf<AmperTask>()
-        val modArg = if (module.path == ".") emptyList() else listOf("-m", module.path)
+        val modArg = if (module.path == ".") emptyList() else listOf("-m", module.name)
 
         // Build
         tasks.add(

@@ -1,6 +1,7 @@
 package tk.mallumo.amper.tasks.ui
 
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.util.IconLoader
 import com.intellij.ui.ColoredTreeCellRenderer
 import com.intellij.ui.SimpleTextAttributes
 import tk.mallumo.amper.tasks.model.TaskGroup
@@ -24,8 +25,14 @@ class AmperTreeCellRenderer : ColoredTreeCellRenderer() {
             }
 
             is AmperTreeNode.DirectoryNode -> {
-                icon = AllIcons.Nodes.Folder
-                append(value.title, SimpleTextAttributes.REGULAR_ATTRIBUTES)
+                val baseIcon = AllIcons.Nodes.Folder
+                if (value.isHidden) {
+                    icon = IconLoader.getDisabledIcon(baseIcon) ?: baseIcon
+                    append(value.title, SimpleTextAttributes.GRAYED_ATTRIBUTES)
+                } else {
+                    icon = baseIcon
+                    append(value.title, SimpleTextAttributes.REGULAR_ATTRIBUTES)
+                }
             }
 
             is AmperTreeNode.ModuleNode -> {
@@ -40,28 +47,53 @@ class AmperTreeCellRenderer : ColoredTreeCellRenderer() {
             }
 
             is AmperTreeNode.TasksRootNode -> {
-                icon = AllIcons.Nodes.Folder
-                append(value.title, SimpleTextAttributes.REGULAR_ATTRIBUTES)
+                val baseIcon = AllIcons.Nodes.Folder
+                if (value.isHidden) {
+                    icon = IconLoader.getDisabledIcon(baseIcon) ?: baseIcon
+                    append(value.title, SimpleTextAttributes.GRAYED_ATTRIBUTES)
+                } else {
+                    icon = baseIcon
+                    append(value.title, SimpleTextAttributes.REGULAR_ATTRIBUTES)
+                }
             }
 
             is AmperTreeNode.GroupNode -> {
-                icon = when (value.group) {
-                    TaskGroup.BUILD -> AllIcons.Actions.Compile
-                    TaskGroup.VERIFICATION -> AllIcons.General.InspectionsOK
-                    TaskGroup.PUBLISHING -> AllIcons.Actions.Upload
-                    TaskGroup.RUN -> AllIcons.Actions.Execute
-                    TaskGroup.HELP -> AllIcons.Actions.Help
-                    TaskGroup.OTHER -> AllIcons.Nodes.Folder
+                val baseIcon = when (value.groupName.lowercase()) {
+                    "build" -> AllIcons.Actions.Compile
+                    "verification" -> AllIcons.General.InspectionsOK
+                    "publishing" -> AllIcons.Actions.Upload
+                    "run" -> AllIcons.Actions.Execute
+                    "help" -> AllIcons.Actions.Help
+                    else -> AllIcons.Nodes.Folder
                 }
-                append(value.title, SimpleTextAttributes.REGULAR_ATTRIBUTES)
+                if (value.isHidden) {
+                    icon = IconLoader.getDisabledIcon(baseIcon) ?: baseIcon
+                    append(value.title, SimpleTextAttributes.GRAYED_ATTRIBUTES)
+                } else {
+                    icon = baseIcon
+                    append(value.title, SimpleTextAttributes.REGULAR_ATTRIBUTES)
+                }
             }
 
             is AmperTreeNode.TaskNode -> {
-                icon = AllIcons.Actions.RunAll
-                append(value.title, SimpleTextAttributes.REGULAR_ATTRIBUTES)
-                toolTipText = "${value.task.description ?: value.title} (amper ${
-                    value.task.commandArgs.joinToString(" ")
-                })"
+                val baseIcon = AllIcons.Actions.RunAll
+                if (value.isHidden) {
+                    icon = IconLoader.getDisabledIcon(baseIcon) ?: baseIcon
+                    append(value.title, SimpleTextAttributes.GRAYED_ATTRIBUTES)
+                } else {
+                    icon = baseIcon
+                    append(value.title, SimpleTextAttributes.REGULAR_ATTRIBUTES)
+                }
+                val cmdInfo = if (value.task.isCustom) {
+                    "${value.task.name} (${value.task.rawCommandLine})"
+                } else {
+                    "${value.task.description ?: value.title} (amper ${
+                        value.task.commandArgs.joinToString(
+                            " "
+                        )
+                    })"
+                }
+                toolTipText = if (value.isHidden) "[Hidden] $cmdInfo" else cmdInfo
             }
 
             else -> {

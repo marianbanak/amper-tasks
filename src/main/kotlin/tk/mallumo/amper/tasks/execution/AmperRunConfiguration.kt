@@ -36,6 +36,24 @@ class AmperRunConfiguration(
             options.moduleName = value
         }
 
+    var isCustom: Boolean
+        get() = options.isCustom
+        set(value) {
+            options.isCustom = value
+        }
+
+    var rawCommandLine: String?
+        get() = options.rawCommandLine
+        set(value) {
+            options.rawCommandLine = value
+        }
+
+    var workingDir: String?
+        get() = options.workingDir
+        set(value) {
+            options.workingDir = value
+        }
+
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState {
         return object : CommandLineState(environment) {
             @Throws(ExecutionException::class)
@@ -44,27 +62,42 @@ class AmperRunConfiguration(
                 val projectRoot = File(basePath)
                 val isWindows = SystemInfo.isWindows
 
-                val kotlinFile = if (isWindows) {
-                    File(projectRoot, "kotlin.bat").takeIf { it.exists() }
-                        ?: File(projectRoot, "kotlin.cmd").takeIf { it.exists() }
-                } else {
-                    File(projectRoot, "kotlin").takeIf { it.exists() }
-                }
-
                 val cmd = GeneralCommandLine()
-                cmd.withWorkDirectory(projectRoot)
+                val workDir = if (!workingDir.isNullOrBlank()) {
+                    File(workingDir!!).takeIf { it.exists() } ?: projectRoot
+                } else {
+                    projectRoot
+                }
+                cmd.withWorkDirectory(workDir)
                 cmd.withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
 
-                if (kotlinFile != null) {
-                    if (!isWindows && !kotlinFile.canExecute()) {
-                        kotlinFile.setExecutable(true)
+                if (isCustom && !rawCommandLine.isNullOrBlank()) {
+                    if (isWindows) {
+                        cmd.exePath = "cmd.exe"
+                        cmd.addParameters("/c", rawCommandLine!!)
+                    } else {
+                        cmd.exePath = "/bin/sh"
+                        cmd.addParameters("-c", rawCommandLine!!)
                     }
-                    cmd.exePath = kotlinFile.absolutePath
                 } else {
-                    cmd.exePath = if (isWindows) "amper.bat" else "amper"
-                }
+                    val kotlinFile = if (isWindows) {
+                        File(projectRoot, "kotlin.bat").takeIf { it.exists() }
+                            ?: File(projectRoot, "kotlin.cmd").takeIf { it.exists() }
+                    } else {
+                        File(projectRoot, "kotlin").takeIf { it.exists() }
+                    }
 
-                cmd.addParameters(commandArgsList)
+                    if (kotlinFile != null) {
+                        if (!isWindows && !kotlinFile.canExecute()) {
+                            kotlinFile.setExecutable(true)
+                        }
+                        cmd.exePath = kotlinFile.absolutePath
+                    } else {
+                        cmd.exePath = if (isWindows) "amper.bat" else "amper"
+                    }
+
+                    cmd.addParameters(commandArgsList)
+                }
 
                 val processHandler = KillableColoredProcessHandler(cmd)
                 ProcessTerminatedListener.attach(processHandler)

@@ -22,15 +22,14 @@ object AmperTaskExecutor {
             var settings = runManager.findConfigurationByTypeAndName(configType, configName)
             if (settings == null) {
                 settings = runManager.createConfiguration(configName, factory)
-                val config = settings.configuration as AmperRunConfiguration
-                config.commandArgsList = task.commandArgs
-                config.moduleName = task.module?.name
                 runManager.addConfiguration(settings)
-            } else {
-                val config = settings.configuration as AmperRunConfiguration
-                config.commandArgsList = task.commandArgs
-                config.moduleName = task.module?.name
             }
+            val config = settings.configuration as AmperRunConfiguration
+            config.commandArgsList = task.commandArgs
+            config.moduleName = task.module?.name
+            config.isCustom = task.isCustom
+            config.rawCommandLine = task.rawCommandLine
+            config.workingDir = task.workingDir ?: task.module?.moduleDir?.path ?: project.basePath
 
             // Select in top toolbar dropdown
             runManager.selectedConfiguration = settings
@@ -46,6 +45,8 @@ object AmperTaskExecutor {
     private fun buildConfigName(project: Project, task: AmperTask): String {
         return if (task.module != null && task.module.path != ".") {
             "${project.name} [${task.module.name}:${task.name}]"
+        } else if (task.targetPath.isNotEmpty()) {
+            "${project.name} [${task.targetPath}:${task.name}]"
         } else {
             "${project.name} [${task.name}]"
         }

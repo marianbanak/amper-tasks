@@ -25,8 +25,14 @@ Amper task with a single double-click.
   love.
 - 🖱️ **Double-Click Execution**: Double-click any task to run it inside IntelliJ's native **Run**
   console with ANSI colors and stop (`■`) controls.
-- 📦 **Smart Multi-Module Support**: Run tasks across the entire project or target individual
-  submodules (`-m <module>`) with zero typing.
+- 📦 **Smart Multi-Module & Directory Hierarchy**: Run tasks across the entire project or target
+  individual submodules (`-m <module>`). Intermediate folders (such as `www-portal`) are cleanly
+  organized into directories.
+- 🛠️ **Custom Command Groups & Shell Commands**: Add custom groups and commands to any project root,
+  directory, or module with multiline shell scripts, custom working directories, and one-click
+  execution.
+- 👁️ **Hide & Declutter**: Hide individual tasks or entire groups via right-click to keep your
+  workspace focused, with a toolbar toggle to view hidden items in gray whenever needed.
 - 🚀 **Application Run**: Automatically detects `product: app/...` modules and adds ready-to-run
   execution tasks.
 - ☁️ **Auto-Discovered Publishing**: Reads repository definitions in your module files and
@@ -38,7 +44,7 @@ Amper task with a single double-click.
 
 ## 🗂️ Task Tree Overview
 
-Amper Tasks organizes your tasks cleanly without cluttered intermediate folders:
+Amper Tasks organizes your tasks and custom scripts cleanly without cluttered intermediate folders:
 
 ```text
 Amper (Tool Window)
@@ -59,52 +65,75 @@ Amper (Tool Window)
     │       ├── show dependencies   (./kotlin show dependencies)
     │       └── show settings       (./kotlin show settings)
     │
-    ├── [Module: core]               <-- Direct module tasks (one-click access)
-    │   ├── build
-    │   │   ├── build               (./kotlin build -m core)
-    │   │   └── clean               (./kotlin clean -m core)
-    │   ├── verification
-    │   │   └── test                (./kotlin test -m core)
-    │   └── help
-    │       └── show dependencies   (./kotlin show dependencies -m core)
+    ├── [Directory: www-portal]      <-- Multi-module intermediate directory
+    │   ├── deploy                  <-- Custom command group (working dir: ./www-portal)
+    │   │   └── build-web           (npm run build)
+    │   ├── [Module: common]
+    │   │   └── build
+    │   │       └── build           (./kotlin build -m common)
+    │   └── [Module: js]
+    │       └── build
+    │           └── build           (./kotlin build -m js)
     │
-    └── [Module: app]
+    └── [Module: core]               <-- Direct module tasks (one-click access)
         ├── build
-        │   └── build               (./kotlin build -m app)
-        ├── run
-        │   └── run                 (./kotlin run -m app)
+        │   ├── build               (./kotlin build -m core)
+        │   └── clean               (./kotlin clean -m core)
+        ├── custom-scripts          <-- Custom module commands
+        │   └── watch-logs          (tail -f logs/app.log)
         └── verification
-            └── test                (./kotlin test -m app)
+            └── test                (./kotlin test -m core)
 ```
 
 ---
 
 ## 🚀 How to Use
 
-1. **Open the Amper Tool Window**:
-    - Click the **Amper** tab on the right sidebar strip, or go to **View** → **Tool Windows** →
-      **Amper**.
-2. **Run a Task**:
-    - **Double-click** any task in the tree, OR
-    - Select a task and press **Enter**, OR
-    - Select a task and click the **Run** (▶️) button on the toolbar.
-3. **View Output**:
-    - The task runs inside IntelliJ's standard **Run** tool window, complete with full ANSI colored
-      logs, links, and termination buttons.
-4. **Refresh**:
-    - Whenever you edit `project.yaml` or `module.yaml`, click the **Reload** (🔄) button on the
-      toolbar to re-scan.
+### 1. Running Built-in Tasks
+
+- **Open Tool Window**: Click the **Amper** tab on the right sidebar strip, or go to **View** →
+  **Tool Windows** → **Amper**.
+- **Run a Task**: Double-click any task in the tree, select a task and press **Enter**, or select a
+  task and click the **Run** (▶️) button on the toolbar.
+- **View Output**: The task runs inside IntelliJ's standard **Run** tool window, complete with ANSI
+  colored logs and process controls.
+- **Reload**: Whenever you edit `project.yaml` or `module.yaml`, click the **Reload** (🔄) button on
+  the toolbar to re-scan.
+
+### 2. Custom Groups & Shell Commands
+
+- **Add a Group**: Right-click the project root, any intermediate directory (e.g., `www-portal`), or
+  any module, and select **Add Group...**.
+- **Add a Command**: Right-click any group (built-in or custom) and select **Add Command...**:
+    - **Command Name**: Friendly display title in the tree.
+    - **CLI / Shell Command**: Multiline shell script or terminal command (3 visible lines with word
+      wrapping).
+    - **Working Directory**: Auto-defaults to the target module or directory folder, with a browse
+      button for custom paths.
+- **Edit / Delete**: Right-click any custom command to edit its command or working directory, or
+  delete it when no longer needed.
+- **Delete Group**: Right-click any custom group to delete the group along with its commands.
+
+### 3. Hiding & Filtering Tasks
+
+- **Hide Tasks**: Right-click any task and select **Hide Task**.
+- **Hide Groups / Directories**: Right-click any group, directory node, or the root `Tasks` node and
+  select **Hide Nodes**.
+- **Toggle Visibility**: Click the **Show / Hide Hidden Items** (👁️) button on the toolbar. When
+  enabled, hidden items appear in gray text; when disabled, they are cleanly filtered out from the
+  tree.
 
 ---
 
 ## 🛠️ Toolbar Controls
 
-| Button | Action                 | Description                                |
-|:------:|------------------------|--------------------------------------------|
-|   ▶️    | **Run Amper Task**     | Executes the selected task in the tree     |
-|   🔄   | **Reload Amper Tasks** | Re-scans project and module configurations |
-|   ⤢    | **Expand All**         | Expands all tree nodes                     |
-|   ⤡    | **Collapse All**       | Collapses all tree nodes                   |
+| Button | Action                       | Description                                                   |
+|:------:|------------------------------|---------------------------------------------------------------|
+|   ▶️    | **Run Amper Task**           | Executes the selected task in the tree                        |
+|   🔄   | **Reload Amper Tasks**       | Re-scans project and module configurations                    |
+|   👁️   | **Show / Hide Hidden Items** | Toggles visibility of hidden tasks & nodes (grayed out state) |
+|   ⤢    | **Expand All**               | Expands all tree nodes                                        |
+|   ⤡    | **Collapse All**             | Collapses all tree nodes                                      |
 
 ---
 
