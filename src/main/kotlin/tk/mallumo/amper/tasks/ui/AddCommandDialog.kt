@@ -3,6 +3,7 @@ package tk.mallumo.amper.tasks.ui
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.openapi.ui.TextBrowseFolderListener
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.components.JBLabel
@@ -35,10 +36,11 @@ class AddCommandDialog(
     private val workingDirField = TextFieldWithBrowseButton().apply {
         text = existingWorkingDir.ifEmpty { defaultWorkingDir }
         addBrowseFolderListener(
-            "Select Working Directory",
-            null,
-            myProject,
-            FileChooserDescriptorFactory.createSingleFolderDescriptor()
+            TextBrowseFolderListener(
+                FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                    .withTitle("Select Working Directory"),
+                myProject
+            )
         )
     }
 

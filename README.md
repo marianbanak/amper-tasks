@@ -162,10 +162,3 @@ Amper (Tool Window)
 2. In IntelliJ IDEA, go to **Settings** → **Plugins** → Gear icon (⚙️) → **Install Plugin from
    Disk...**.
 3. Select the ZIP file and restart the IDE.
-
----
-
-## 💬 Feedback & Issues
-
-Have a feature request, question, or bug report? Contributions and feedback are always welcome
-on [GitHub](https://github.com/marianbanak/amper-tasks).
