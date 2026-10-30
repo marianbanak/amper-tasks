@@ -17,16 +17,11 @@ import com.intellij.ui.ScrollPaneFactory
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.treeStructure.Tree
 import com.intellij.util.ui.JBUI
-import com.intellij.util.ui.tree.TreeUtil
 import tk.mallumo.amper.tasks.actions.RefreshAmperTasksAction
 import tk.mallumo.amper.tasks.actions.RunSelectedAmperTaskAction
 import tk.mallumo.amper.tasks.actions.ToggleShowHiddenTasksAction
 import tk.mallumo.amper.tasks.execution.AmperTaskExecutor
-import tk.mallumo.amper.tasks.model.AmperCustomTasksService
-import tk.mallumo.amper.tasks.model.AmperProject
-import tk.mallumo.amper.tasks.model.AmperProjectScanner
-import tk.mallumo.amper.tasks.model.AmperTask
-import tk.mallumo.amper.tasks.model.CustomCommandData
+import tk.mallumo.amper.tasks.model.*
 import java.awt.BorderLayout
 import java.awt.CardLayout
 import java.awt.Component
@@ -34,12 +29,10 @@ import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
-import java.util.UUID
-import javax.swing.JComponent
-import javax.swing.JPanel
-import javax.swing.KeyStroke
-import javax.swing.SwingConstants
-import javax.swing.SwingUtilities
+import java.util.*
+import javax.swing.*
+import javax.swing.event.TreeExpansionEvent
+import javax.swing.event.TreeExpansionListener
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreeNode
 import javax.swing.tree.TreePath
@@ -53,6 +46,9 @@ class AmperTreePanel(val project: Project) : JPanel(BorderLayout()) {
         "<html><center>No Amper project configuration found.<br/>(Looking for project.yaml, module.yaml, or ./kotlin)</center></html>",
         SwingConstants.CENTER
     )
+
+    private var isFirstLoad = true
+    private var isUpdatingTreeModel = false
 
     companion object {
         private const val CARD_TREE = "TREE"
@@ -99,6 +95,20 @@ class AmperTreePanel(val project: Project) : JPanel(BorderLayout()) {
             KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
             JComponent.WHEN_FOCUSED
         )
+
+        tree.addTreeExpansionListener(object : TreeExpansionListener {
+            override fun treeExpanded(event: TreeExpansionEvent) {
+                if (!isUpdatingTreeModel) {
+                    saveCurrentExpandedState()
+                }
+            }
+
+            override fun treeCollapsed(event: TreeExpansionEvent) {
+                if (!isUpdatingTreeModel) {
+                    saveCurrentExpandedState()
+                }
+            }
+        })
     }
 
     private fun showContextMenu(invoker: Component, x: Int, y: Int, node: Any?) {
@@ -383,13 +393,34 @@ class AmperTreePanel(val project: Project) : JPanel(BorderLayout()) {
     }
 
     private fun updateTreeModel(amperProject: AmperProject) {
-        val savedExpanded = saveExpandedPaths()
         val customTasksService = AmperCustomTasksService.getInstance(project)
-        val hiddenKeys = customTasksService.getHiddenKeys()
-        val showHidden = customTasksService.showHidden
-        val rootNode = AmperTreeNode.buildTree(amperProject, hiddenKeys, showHidden)
-        tree.model = DefaultTreeModel(rootNode)
-        restoreExpandedPaths(savedExpanded)
+        val savedExpanded = if (isFirstLoad) {
+            isFirstLoad = false
+            customTasksService.getExpandedPaths()
+        } else {
+            val current = saveExpandedPaths()
+            customTasksService.setExpandedPaths(current)
+            current
+        }
+
+        isUpdatingTreeModel = true
+        try {
+            val hiddenKeys = customTasksService.getHiddenKeys()
+            val showHidden = customTasksService.showHidden
+            val rootNode = AmperTreeNode.buildTree(amperProject, hiddenKeys, showHidden)
+            tree.model = DefaultTreeModel(rootNode)
+            if (savedExpanded.isEmpty() || savedExpanded.contains("project")) {
+                tree.expandRow(0)
+            }
+            restoreExpandedPaths(savedExpanded)
+        } finally {
+            isUpdatingTreeModel = false
+        }
+    }
+
+    private fun saveCurrentExpandedState() {
+        val expanded = saveExpandedPaths()
+        AmperCustomTasksService.getInstance(project).setExpandedPaths(expanded)
     }
 
     private fun saveExpandedPaths(): Set<String> {
@@ -405,7 +436,6 @@ class AmperTreePanel(val project: Project) : JPanel(BorderLayout()) {
 
     private fun restoreExpandedPaths(saved: Set<String>) {
         if (saved.isEmpty()) {
-            TreeUtil.expandAll(tree)
             return
         }
         val root = tree.model.root as? TreeNode ?: return
@@ -417,18 +447,22 @@ class AmperTreePanel(val project: Project) : JPanel(BorderLayout()) {
         currentPath: TreePath,
         saved: Set<String>
     ) {
-        val pathStr = pathToString(currentPath)
-        if (saved.contains(pathStr)) {
-            tree.expandPath(currentPath)
-        }
-        for (i in 0 until node.childCount) {
-            val child = node.getChildAt(i)
-            restoreExpandedRecursively(child, currentPath.pathByAddingChild(child), saved)
+        try {
+            val pathStr = pathToString(currentPath)
+            if (saved.contains(pathStr)) {
+                tree.expandPath(currentPath)
+            }
+            for (i in 0 until node.childCount) {
+                val child = node.getChildAt(i) ?: continue
+                restoreExpandedRecursively(child, currentPath.pathByAddingChild(child), saved)
+            }
+        } catch (_: Throwable) {
+            // Safely ignore any errors if a node no longer exists
         }
     }
 
     private fun pathToString(path: TreePath): String {
-        return path.path.joinToString("/") { (it as? AmperTreeNode)?.key ?: it.toString() }
+        return path.path.mapNotNull { (it as? AmperTreeNode)?.key ?: it?.toString() }.joinToString("/")
     }
 }
 

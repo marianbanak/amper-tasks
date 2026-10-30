@@ -26,6 +26,7 @@ class CustomTasksState {
     var commands: MutableList<CustomCommandData> = mutableListOf()
     var hiddenKeys: MutableSet<String> = mutableSetOf()
     var showHidden: Boolean = false
+    var expandedPaths: MutableSet<String> = mutableSetOf()
 }
 
 @Service(Service.Level.PROJECT)
@@ -122,6 +123,14 @@ class AmperCustomTasksService(val project: Project) : PersistentStateComponent<C
         val next = !isHidden(key)
         setHidden(key, next)
         return next
+    }
+
+    fun getExpandedPaths(): Set<String> {
+        return myState.expandedPaths.toSet()
+    }
+
+    fun setExpandedPaths(paths: Set<String>) {
+        myState.expandedPaths = paths.toMutableSet()
     }
 
     companion object {
