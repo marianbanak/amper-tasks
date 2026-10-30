@@ -334,4 +334,53 @@ class AmperModelTest {
         val mod2Node = dirNode.getChildAt(2) as AmperTreeNode.ModuleNode
         assertEquals("js", mod2Node.title)
     }
+
+    @Test
+    fun testExpandedPathsStateAndIgnoreMissingNodes() {
+        val state = CustomTasksState()
+        // Default state must be empty (collapsed by default)
+        assertTrue(state.expandedPaths.isEmpty())
+
+        state.expandedPaths.add("project/dir:www-portal")
+        state.expandedPaths.add("project/dir:non-existent/module:missing")
+        assertEquals(2, state.expandedPaths.size)
+
+        val rootDir = LightVirtualFile("root")
+        val modDir = LightVirtualFile("common")
+        val mod = AmperModule(name = "common", path = "www-portal/common", moduleDir = modDir)
+
+        val project = AmperProject(
+            name = "my-project",
+            rootDir = rootDir,
+            projectTasks = emptyList(),
+            modules = listOf(mod),
+            moduleTasks = emptyMap()
+        )
+
+        val treeRoot = AmperTreeNode.buildTree(project)
+        // Tree has project -> www-portal -> common
+        assertEquals(1, treeRoot.childCount)
+        val dirNode = treeRoot.getChildAt(0) as AmperTreeNode.DirectoryNode
+        assertEquals("dir:www-portal", dirNode.key)
+
+        // Simulate restoration logic with non-existent path: must succeed without NPE
+        val saved = state.expandedPaths
+        val visitedPaths = mutableListOf<String>()
+
+        fun testRestore(node: javax.swing.tree.TreeNode, currentPath: javax.swing.tree.TreePath) {
+            val pathStr =
+                currentPath.path.mapNotNull { (it as? AmperTreeNode)?.key ?: it?.toString() }.joinToString("/")
+            if (saved.contains(pathStr)) {
+                visitedPaths.add(pathStr)
+            }
+            for (i in 0 until node.childCount) {
+                val child = node.getChildAt(i) ?: continue
+                testRestore(child, currentPath.pathByAddingChild(child))
+            }
+        }
+
+        testRestore(treeRoot, javax.swing.tree.TreePath(treeRoot))
+        // Only existing node "project/dir:www-portal" should match, "project/dir:non-existent/module:missing" is ignored
+        assertEquals(listOf("project/dir:www-portal"), visitedPaths)
+    }
 }
