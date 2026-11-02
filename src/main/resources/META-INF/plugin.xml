@@ -29,13 +29,31 @@
     ]]></description>
 
     <change-notes><![CDATA[
-    <h3>1.0.0</h3>
-    <ul>
-      <li>Initial release of Amper Tasks for IntelliJ IDEA.</li>
-      <li>Full project and module task tree visualization.</li>
-      <li>Double-click task execution in integrated Run console.</li>
-      <li>Auto-detection of application modules and publishable repositories.</li>
-    </ul>
+<h1>What's New in v1.0.3</h1>
+
+<p>We’re excited to bring you the latest update with new ways to work smarter and a few handy fixes to make your experience smoother.</p>
+
+<h3>Highlights</h3>
+<ul>
+  <li>Your task tree now remembers which folders were expanded, so you can pick up where you left off without losing your view.</li>
+  <li>New handy tools: <strong>Custom Command Groups</strong>, <strong>Shell Commands</strong>, and a <strong>Hide &amp; Declutter</strong> option let you tailor the plugin to your workflow.</li>
+  <li>Run Amper tasks with a single double‑click for quick access.</li>
+  <li>The plugin UI has been refreshed with clearer installation steps and brand‑new icons.</li>
+</ul>
+
+<h3>Improvements &amp; Fixes</h3>
+<ul>
+  <li>Fixed a small issue that could cause the plugin to reset unexpectedly — now it’s more stable.</li>
+  <li>The tree view expands correctly when you reopen the plugin.</li>
+  <li>Installation guide updated for easier setup.</li>
+</ul>
+<h3>1.0.0</h3>
+<ul>
+    <li>Initial release of Amper Tasks for IntelliJ IDEA.</li>
+    <li>Full project and module task tree visualization.</li>
+    <li>Double-click task execution in integrated Run console.</li>
+    <li>Auto-detection of application modules and publishable repositories.</li>
+</ul>
     ]]></change-notes>
 
     <depends>com.intellij.modules.platform</depends>
