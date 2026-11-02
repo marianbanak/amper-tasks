@@ -5,7 +5,6 @@
 [![JetBrains Marketplace](https://img.shields.io/badge/JetBrains%20Marketplace-Amper%20Tasks-orange?logo=jetbrains)](https://plugins.jetbrains.com)
 [![Compatible IDEs](https://img.shields.io/badge/IntelliJ%20IDEA-2024.2+-blue?logo=intellijidea)](https://plugins.jetbrains.com)
 [![Amper Support](https://img.shields.io/badge/Amper-Ready-purple)](https://github.com/JetBrains/amper)
-![repsy.io](https://img.shields.io/maven-metadata/v?metadataUrl=https%3A%2F%2Frepo.repsy.io%2Fuser42380946%2Fmaven%2Ftk%2Fmallumo%2Famper-tasks%2Fmaven-metadata.xml)
 ---
 
 Working with [Kotlin Amper](https://github.com/JetBrains/amper) in IntelliJ IDEA? Missing the
@@ -174,10 +173,3 @@ Amper (Tool Window)
 2. In IntelliJ IDEA, go to **Settings** → **Plugins** → Gear icon (⚙️) → **Install Plugin from
    Disk...**.
 3. Select the ZIP file and restart the IDE.
-
----
-
-## 💬 Feedback & Issues
-
-Have a feature request, question, or bug report? Contributions and feedback are always welcome
-on [GitHub](https://github.com/marianbanak/amper-tasks).
