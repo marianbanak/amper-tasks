@@ -1,4 +1,4 @@
-import java.util.Properties
+import java.util.*
 import java.util.zip.ZipOutputStream
 
 plugins {
@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "tk.mallumo"
-version = "1.0.2"
+version = "1.0.3"
 
 repositories {
     mavenCentral()
