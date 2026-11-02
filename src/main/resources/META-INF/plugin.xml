@@ -10,6 +10,7 @@
     <p>
       <b>Amper Tasks</b> brings the familiar, convenient sidebar experience to
       <a href="https://github.com/JetBrains/amper">Kotlin Amper</a> projects in IntelliJ IDEA.
+      Organize, explore, and run all your Amper tasks and custom shell scripts with a single double-click.
     </p>
 
     <h4>Key Features:</h4>
@@ -17,7 +18,10 @@
       <li><b>Zero Configuration</b>: Automatically detects <code>project.yaml</code>, <code>module.yaml</code>, or <code>./kotlin</code> wrapper upon opening.</li>
       <li><b>Double-Click to Run</b>: Double-click any task or select and press Enter to execute.</li>
       <li><b>Integrated Console</b>: Tasks stream directly into IntelliJ's standard Run tool window with ANSI colors and stop (■) control.</li>
-      <li><b>Smart Multi-Module Support</b>: Run project-wide tasks or target specific submodules (<code>-m &lt;module&gt;</code>) without typing.</li>
+      <li><b>Smart Multi-Module &amp; Directory Hierarchy</b>: Run project-wide tasks or target specific submodules (<code>-m &lt;module&gt;</code>) without typing, with intermediate folders cleanly organized into directories.</li>
+      <li><b>Custom Command Groups &amp; Shell Commands</b>: Add custom groups and multiline CLI/shell commands to any project root, directory, or module with configurable working directories.</li>
+      <li><b>Hide &amp; Declutter</b>: Right-click to hide tasks, groups, or directories to keep your workspace focused, with a toolbar toggle to view hidden items in gray.</li>
+      <li><b>Persistent Tree State</b>: Remembers your exact expanded and collapsed folders, modules, and task groups across IDE restarts, remaining neatly collapsed by default on fresh projects.</li>
       <li><b>Application Run Support</b>: Auto-detects <code>product: app/...</code> modules to provide one-click run tasks.</li>
       <li><b>Publishing Discovery</b>: Automatically generates publish tasks for repositories marked with <code>publish: true</code> (<code>mavenLocal</code>, Repsy, etc.).</li>
       <li><b>Project &amp; Module Inspection</b>: Quick access to <code>show modules</code>, <code>show tasks</code>, <code>show dependencies</code>, and <code>show settings</code>.</li>

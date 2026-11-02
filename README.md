@@ -33,6 +33,8 @@ Amper task with a single double-click.
   execution.
 - 👁️ **Hide & Declutter**: Hide individual tasks or entire groups via right-click to keep your
   workspace focused, with a toolbar toggle to view hidden items in gray whenever needed.
+- 💾 **Persistent Tree State**: Remembers your exact expanded and collapsed folders, modules, and
+  task groups across IDE restarts, while keeping the tree clean and collapsed by default on fresh projects.
 - 🚀 **Application Run**: Automatically detects `product: app/...` modules and adds ready-to-run
   execution tasks.
 - ☁️ **Auto-Discovered Publishing**: Reads repository definitions in your module files and
@@ -123,6 +125,16 @@ Amper (Tool Window)
   enabled, hidden items appear in gray text; when disabled, they are cleanly filtered out from the
   tree.
 
+### 4. Smart Tree Expansion & Persistence
+
+- **Clean Defaults**: On first load, only the project root is expanded while modules, directories, and
+  task groups stay neatly collapsed.
+- **Auto-Remembered State**: Any folders, modules, or task groups you expand or collapse are
+  automatically remembered in the project configuration (`.idea/amperCustomTasks.xml`) and restored
+  when reopening IntelliJ IDEA or reloading tasks.
+- **Resilient**: If modules or folders are deleted or renamed outside IntelliJ, missing paths are
+  gracefully ignored.
+
 ---
 
 ## 🛠️ Toolbar Controls
@@ -162,3 +174,10 @@ Amper (Tool Window)
 2. In IntelliJ IDEA, go to **Settings** → **Plugins** → Gear icon (⚙️) → **Install Plugin from
    Disk...**.
 3. Select the ZIP file and restart the IDE.
+
+---
+
+## 💬 Feedback & Issues
+
+Have a feature request, question, or bug report? Contributions and feedback are always welcome
+on [GitHub](https://github.com/marianbanak/amper-tasks).
